@@ -7,7 +7,7 @@ package jtk.basic;
 //The greatest common divisor (GCD) of two integers is the largest integer that evenly divides both of the numbers.
 public class GCD {
     public static void main(String[] args) {
-        System.out.println("Gcd(60,24) = " + Gcd(4851, 3003));
+        System.out.println("Gcd(4851,3003) = " + Gcd(4851, 3003));
     }
 
     //Because the size of B decreases by a factor of at least 1/2 for every two iterations,
