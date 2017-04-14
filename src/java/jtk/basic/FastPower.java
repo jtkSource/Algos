@@ -16,7 +16,10 @@ public class FastPower {
 
     //will not work for powers < 4
     public static void main(String[] args) {
-
+        for (int i = 0; i < 100; i++) {
+            Math.pow(2, 10);
+            calculatePower(2, 10);
+        }
         long startTime = System.nanoTime();
         System.out.println("Math.pow(29,199) = " + Math.pow(29, 199));
         long endTime = System.nanoTime();
