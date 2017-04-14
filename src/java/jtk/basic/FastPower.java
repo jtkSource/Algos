@@ -14,26 +14,24 @@ public class FastPower {
 
     private static Map<Integer,Double> powerMap = new HashMap<>();
 
+    //will not work for powers < 4
     public static void main(String[] args) {
 
-        for (int i = 0; i < 10 ; i++) {
-            Math.pow(2,3);
-            calculatePower(2,3);
-        }
-
         long startTime = System.nanoTime();
-        System.out.println("Math.pow(7,125) = " + Math.pow(19,125));
+        System.out.println("Math.pow(29,199) = " + Math.pow(29, 199));
         long endTime = System.nanoTime();
-        System.out.println("(endTime - startTime) ns = " + (endTime - startTime));
+        System.out.println("(endTime - startTime) = " + (endTime - startTime) / 10_000);
 
         startTime = System.nanoTime();
-        System.out.println("calculatePower() = " + calculatePower(19.0,125));
+        System.out.println("calculatePower(29,199) = " + calculatePower(29.0, 199));
         endTime = System.nanoTime();
-        System.out.println("(endTime - startTime) ns = " + (endTime - startTime));
+        System.out.println("(endTime - startTime) = " + (endTime - startTime) / 10_000);
 
     }
 
     private static double calculatePower(double base, double exp) {
+        if (exp <= 4)
+            throw new UnsupportedOperationException("Power cannot be less than or equal to 4");
         powerMap.clear();
         calculateForPow2(base,exp);
         return sumPowers(exp);
@@ -49,9 +47,10 @@ public class FastPower {
         double result=1.0;
         while (iter.hasNext()){//O(log(n)) because it iterates over the reduced set.
             int temp = (int) iter.next();
-            if(exp1+temp <= exp){
-                result=result*powerMap.get(temp);
-                exp1=exp1+temp;
+            if (exp1 + temp <= exp) {
+                result *= powerMap.get(temp);
+                exp1 += temp;
+
             }
         }
         return result;
