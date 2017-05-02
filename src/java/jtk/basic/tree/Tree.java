@@ -4,113 +4,252 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.Consumer;
 
 /**
- * Created by jubin on 1/2/17.
+ *
  */
-public class Tree<T, B extends Tree.TreeNode.Branch<?>> {
+public class Tree<T extends Comparable, B extends Tree.TreeNode.Branch<? extends Comparable>> {
 
-    private final TreeNode<T, B> root;
+    private TreeNode root;
 
-    public Tree(TreeNode<T, B> root) {
+    public Tree(TreeNode root) {
         this.root = root;
     }
 
-    public static void main(String[] args) {
-
-        /**
-         *                  D
-         *                B   E
-         *              A   C
-         */
-        TreeNode<String, TreeNode.Branch<String>> root = new TreeNode<>("D");
-        Tree<String, TreeNode.Branch<String>> tree = new Tree<>(root);
-        TreeNode<String, TreeNode.Branch<String>> level11 = new TreeNode<>("B");
-        TreeNode<String, TreeNode.Branch<String>> level12 = new TreeNode<>("E");
-        TreeNode<String, TreeNode.Branch<String>> level21 = new TreeNode<>("A");
-        TreeNode<String, TreeNode.Branch<String>> level22 = new TreeNode<>("C");
-        root.addBranch(new TreeNode.Branch<>("", root, level11)).addBranch(new TreeNode.Branch<>("", root, level12));
-        level11.addBranch(new TreeNode.Branch<>("", level11, level21)).addBranch(new TreeNode.Branch<>("", level11, level22));
-
-        /***  O(N) run time. Depth of recursion equal to the tree's height.
-         * If the tree is very tall, that could cause a stack overflow. ***/
-        System.out.println("tree.traversePreOrder(root); = ");
-        tree.traversePreOrder(root);
-        System.out.println("tree.traverseInOrder(root) = ");
-        tree.traverseInOrder(root);
-        System.out.println("tree.traversePostOrder(root); = ");
-        tree.traversePostOrder(root);
-        /***  the algorithm takes O(N) time              ***/
-        System.out.println("tree.traverseDepthFirst(root); = ");
-        tree.traverseDepthFirst(root);
+    public TreeNode getRoot() {
+        return root;
     }
 
-    public void traversePreOrder(TreeNode<T, B> node) {
-        System.out.println("node.getData() = " + node.getData());
+    public <D extends Comparable> void addBranch(TreeNode root, TreeNode child, D branchData) {
+        root.addBranch(new TreeNode.Branch(branchData, root, child));
+    }
+
+    public <N extends Comparable, D extends Comparable> void addBranchSortedToBinaryTree(N nodeData, D branchData) {
+        addBranchSortedToBinaryTree(root, new Tree.TreeNode<>(nodeData, 2), branchData);
+    }
+
+    public <D extends Comparable> TreeNode findElementInBinarySortedTree(D data) {
+        return findElementInBinarySortedTree(root, data);
+    }
+
+    public <D extends Comparable> boolean deleteElementInBinarySortedTree(D data) {
+        return deleteElementInBinarySortedTree(root, new Tree.TreeNode.Branch<>("rootHolder", null, root), data);
+    }
+
+    private <D extends Comparable> boolean deleteElementInBinarySortedTree(TreeNode root, TreeNode.Branch parentBranch, D data) {
+        if (root.getDegree() != 2) {
+            throw new RuntimeException("Should be degree 2");
+        }
+        if (root.getData().compareTo(data) == 0) {
+            if (root.branches.stream().allMatch(o -> o == null))
+                parentBranch.setChild(null);
+            if (root.branches.get(0) != null && root.branches.get(1) != null) {//if both left and right child is present
+                TreeNode leftChild = ((TreeNode.Branch) root.branches.get(0)).getChild();
+                TreeNode.Branch rightMostBranch = getRightMostBranch((TreeNode.Branch) leftChild.branches.get(1));
+                parentBranch.setChild(rightMostBranch.getChild());
+                if (rightMostBranch.getChild().branches.get(0) != null) {
+                    // move left child on the right most branch to the child of right most branch
+                    // (which already replaced the deleted node)
+                    rightMostBranch.setChild(((TreeNode.Branch) rightMostBranch.getChild().branches.get(0)).getChild());
+                } else {//else stub out the right branch
+                    rightMostBranch.getParent().branches.set(1, null);
+                }
+                parentBranch.getChild().addBranch(root.getBranches(0), 0);
+                parentBranch.getChild().addBranch(root.getBranches(1), 1);
+                if (parentBranch.getBranchData().equals("rootHolder"))
+                    this.root = parentBranch.getChild();
+
+            } else if (root.branches.get(1) != null && root.branches.get(0) == null) {// if only right child directly replace
+                parentBranch.setChild(((TreeNode.Branch) root.branches.get(1)).getChild());
+            } else if (root.branches.get(0) != null && root.branches.get(1) == null) { // if only left child exists
+                parentBranch.setChild(((TreeNode.Branch) root.branches.get(0)).getChild());
+            }
+            return true;
+        } else {
+            if (root.getData().compareTo(data) > 0 && root.branches.get(0) != null) {
+                return deleteElementInBinarySortedTree(((TreeNode.Branch) root.branches.get(0)).getChild(), (TreeNode.Branch) root.branches.get(0), data);
+            } else if (root.getData().compareTo(data) < 0 && root.branches.get(1) != null) {
+                return deleteElementInBinarySortedTree(((TreeNode.Branch) root.branches.get(1)).getChild(), (TreeNode.Branch) root.branches.get(1), data);
+            } else return false;
+        }
+    }
+
+    private TreeNode.Branch getRightMostBranch(TreeNode.Branch branch) {
+        if (branch.getChild().branches.get(1) != null)
+            branch = getRightMostBranch((TreeNode.Branch) branch.getChild().branches.get(1));
+        return branch;
+    }
+
+    private <D extends Comparable> TreeNode findElementInBinarySortedTree(TreeNode root, D data) {
+        if (root.getDegree() != 2) {
+            throw new RuntimeException("Should be degree 2");
+        }
+        if (root.getData().compareTo(data) == 0)
+            return root;
+        if (root.getData().compareTo(data) >= 0) {
+            if (root.branches.get(0) != null)
+                return findElementInBinarySortedTree(((TreeNode.Branch) root.branches.get(0)).getChild(), data);
+        } else {
+            if (root.branches.get(1) != null)
+                return findElementInBinarySortedTree(((TreeNode.Branch) root.branches.get(1)).getChild(), data);
+        }
+
+        return null;//
+    }
+
+
+    private <D extends Comparable> void addBranchSortedToBinaryTree(TreeNode root, TreeNode child, D branchData) {
+        if (root.getDegree() == 2 && child.getDegree() == 2) {
+
+            if (root.getData().compareTo(child.getData()) < 0) {
+                if (root.branches.get(1) != null)
+                    addBranchSortedToBinaryTree(((TreeNode.Branch) root.branches.get(1)).getChild(), child, "R");
+                else
+                    root.addBranch(new TreeNode.Branch("R", root, child), 1);
+            } else if (root.getData().compareTo(child.getData()) > 0) {
+                if (root.branches.get(0) != null)
+                    addBranchSortedToBinaryTree(((TreeNode.Branch) root.branches.get(0)).getChild(), child, "L");
+                else
+                    root.addBranch(new TreeNode.Branch("L", root, child), 0);
+            }
+
+        } else {
+            throw new RuntimeException("Tree should be degree 2");
+        }
+    }
+
+    public void traversePreOrder(TreeNode<T, B> node, Consumer<TreeNode<T, B>> doSomething) {
+        doSomething.accept(node);
         if (node.branches.isEmpty()) {
             return;
         }
         for (TreeNode.Branch branch : node.branches) {
-            traversePreOrder(branch.getChild());
+            traversePreOrder(branch.getChild(), doSomething);
         }
     }
 
-    public void traverseInOrder(TreeNode<T, B> node) {
+    public void traverseInOrder(TreeNode<T, B> node, Consumer<TreeNode<T, B>> doSomething) {
         if (node.branches.isEmpty()) {
-            System.out.println("node.getData() = " + node.getData());
+            doSomething.accept(node);
             return;
         }
         for (int i = 0; i < node.branches.size(); i++) {
             if (i == (node.branches.size()) / 2)
-                System.out.println("node.getData() = " + node.getData());
-            traverseInOrder(node.branches.get(i).getChild());
+                doSomething.accept(node);
+            traverseInOrder(node.branches.get(i).getChild(), doSomething);
         }
     }
 
-    public void traversePostOrder(TreeNode<T, B> node) {
+    public void traversePostOrder(TreeNode<T, B> node, Consumer<TreeNode<T, B>> doSomething) {
         if (node.branches.isEmpty()) {
-            System.out.println("node.getData() = " + node.getData());
+            doSomething.accept(node);
             return;
         }
         for (TreeNode.Branch branch : node.branches) {
-            traversePostOrder(branch.getChild());
+            traversePostOrder(branch.getChild(), doSomething);
         }
-        System.out.println("node.getData() = " + node.getData());
+        doSomething.accept(node);
     }
 
-    public void traverseDepthFirst(TreeNode<T, B> node) {
+    public void traverseDepthFirst(TreeNode<T, B> node, Consumer<TreeNode<T, B>> doSomething) {
         Queue<TreeNode<T, B>> treeNodes = new LinkedList<>();
         treeNodes.add(node);
         while (!treeNodes.isEmpty()) {
             TreeNode<T, B> treeNode = treeNodes.remove();
-            System.out.println("node.getData() = " + treeNode.getData());
+            doSomething.accept(treeNode);
             for (TreeNode.Branch branch : treeNode.branches) {
+                if (branch == null) continue;
                 treeNodes.add(branch.getChild());
             }
         }
     }
 
-    public static class TreeNode<T, B extends TreeNode.Branch<?>> {
+
+    public void printTree() {
+        printNode(root, 0);
+    }
+
+    public void printTreeWithBranchData(String branchData) {
+        printNode(root, 0, branchData);
+    }
+
+    private void printNode(TreeNode<T, B> node, int level) {
+        node.prettyPrint(level);
+        for (int i = 0; i < node.branches.size(); i++) {
+            if (node.branches.get(i) == null) continue;
+            printNode(node.branches.get(i).getChild(), level + 1);
+        }
+    }
+
+    private void printNode(TreeNode<T, B> node, int level, String rootBranchData) {
+        node.prettyPrint(level, rootBranchData);
+        for (int i = 0; i < node.branches.size(); i++) {
+            if (node.branches.get(i) == null) continue;
+            printNode(node.branches.get(i).getChild(), level + 1, node.branches.get(i).getBranchData().toString());
+        }
+    }
+
+    public static class TreeNode<T extends Comparable, B extends TreeNode.Branch<? extends Comparable>> {
+
         private final T data;
+        private int degree;
+
         private List<B> branches = new ArrayList<>();
 
         public TreeNode(T data) {
             this.data = data;
         }
 
+
+        public TreeNode(T data, int degree) {
+            this.data = data;
+            this.degree = degree;
+            branches = new ArrayList<>(degree);
+            for (int i = 0; i < degree; i++) {
+                branches.add(null);
+            }
+        }
+
         public T getData() {
             return data;
         }
 
-        public TreeNode addBranch(B branch) {
-            this.branches.add(branch);
-            return this;
+        public int getDegree() {
+            return degree;
         }
 
-        public static class Branch<B> {
+        public List<B> getBranches() {
+            return branches;
+        }
+
+        public B getBranches(int index) {
+            return branches.get(index);
+        }
+
+        public void addBranch(B branch) {
+            this.branches.add(branch);
+        }
+
+        public void addBranch(B branch, int index) {
+            this.branches.set(index, branch);
+        }
+
+        public void prettyPrint(int level) {
+            String pad = new String(new char[level]).replace('\0', ' ');
+            System.out.println(pad + "|- " + getData());
+        }
+
+
+        public void prettyPrint(int level, String branchData) {
+            String pad = new String(new char[level]).replace('\0', ' ');
+            System.out.println(pad + "|- " + getData() + " (" + branchData + ":" + level + ")");
+        }
+
+        public static class Branch<B extends Comparable> {
             private final B branchData;
             private final TreeNode parent;
-            private final TreeNode child;
+            private TreeNode child;
 
             public Branch(B branchData, TreeNode parent, TreeNode child) {
                 this.branchData = branchData;
@@ -120,6 +259,10 @@ public class Tree<T, B extends Tree.TreeNode.Branch<?>> {
 
             public TreeNode getChild() {
                 return child;
+            }
+
+            public void setChild(TreeNode child) {
+                this.child = child;
             }
 
             public TreeNode getParent() {
