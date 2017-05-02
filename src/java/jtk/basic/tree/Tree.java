@@ -1,9 +1,6 @@
 package jtk.basic.tree;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -11,10 +8,14 @@ import java.util.function.Consumer;
  */
 public class Tree<T extends Comparable, B extends Tree.TreeNode.Branch<? extends Comparable>> {
 
-    private TreeNode root;
+    private TreeNode<T, B> root;
 
-    public Tree(TreeNode root) {
-        this.root = root;
+    public Tree(T t) {
+        this.root = new Tree.TreeNode<>(t);
+    }
+
+    public Tree(T t, int degree) {
+        this.root = new Tree.TreeNode<>(t, degree);
     }
 
     public TreeNode getRoot() {
@@ -23,6 +24,15 @@ public class Tree<T extends Comparable, B extends Tree.TreeNode.Branch<? extends
 
     public <D extends Comparable> void addBranch(TreeNode root, TreeNode child, D branchData) {
         root.addBranch(new TreeNode.Branch(branchData, root, child));
+    }
+
+    public <N extends Comparable, D extends Comparable> void addBranch(TreeNode root, N childData, D branchData) {
+        root.addBranch(new TreeNode.Branch(branchData, root, new Tree.TreeNode<>(childData)));
+    }
+
+    public <N extends Comparable> Optional<B> searchNodesChildrenForData(TreeNode<T, B> node, N childData) {
+        return node.branches.stream().filter(b -> b.getChild().getData().compareTo(childData) == 0)
+                .findFirst();
     }
 
     public <N extends Comparable, D extends Comparable> void addBranchSortedToBinaryTree(N nodeData, D branchData) {
@@ -37,7 +47,7 @@ public class Tree<T extends Comparable, B extends Tree.TreeNode.Branch<? extends
         return deleteElementInBinarySortedTree(root, new Tree.TreeNode.Branch<>("rootHolder", null, root), data);
     }
 
-    private <D extends Comparable> boolean deleteElementInBinarySortedTree(TreeNode root, TreeNode.Branch parentBranch, D data) {
+    private <D extends Comparable> boolean deleteElementInBinarySortedTree(TreeNode<T, B> root, TreeNode.Branch parentBranch, D data) {
         if (root.getDegree() != 2) {
             throw new RuntimeException("Should be degree 2");
         }
@@ -45,7 +55,7 @@ public class Tree<T extends Comparable, B extends Tree.TreeNode.Branch<? extends
             if (root.branches.stream().allMatch(o -> o == null))
                 parentBranch.setChild(null);
             if (root.branches.get(0) != null && root.branches.get(1) != null) {//if both left and right child is present
-                TreeNode leftChild = ((TreeNode.Branch) root.branches.get(0)).getChild();
+                TreeNode leftChild = root.branches.get(0).getChild();
                 TreeNode.Branch rightMostBranch = getRightMostBranch((TreeNode.Branch) leftChild.branches.get(1));
                 parentBranch.setChild(rightMostBranch.getChild());
                 if (rightMostBranch.getChild().branches.get(0) != null) {
@@ -61,16 +71,16 @@ public class Tree<T extends Comparable, B extends Tree.TreeNode.Branch<? extends
                     this.root = parentBranch.getChild();
 
             } else if (root.branches.get(1) != null && root.branches.get(0) == null) {// if only right child directly replace
-                parentBranch.setChild(((TreeNode.Branch) root.branches.get(1)).getChild());
+                parentBranch.setChild(root.branches.get(1).getChild());
             } else if (root.branches.get(0) != null && root.branches.get(1) == null) { // if only left child exists
-                parentBranch.setChild(((TreeNode.Branch) root.branches.get(0)).getChild());
+                parentBranch.setChild(root.branches.get(0).getChild());
             }
             return true;
         } else {
             if (root.getData().compareTo(data) > 0 && root.branches.get(0) != null) {
-                return deleteElementInBinarySortedTree(((TreeNode.Branch) root.branches.get(0)).getChild(), (TreeNode.Branch) root.branches.get(0), data);
+                return deleteElementInBinarySortedTree(root.branches.get(0).getChild(), root.branches.get(0), data);
             } else if (root.getData().compareTo(data) < 0 && root.branches.get(1) != null) {
-                return deleteElementInBinarySortedTree(((TreeNode.Branch) root.branches.get(1)).getChild(), (TreeNode.Branch) root.branches.get(1), data);
+                return deleteElementInBinarySortedTree(root.branches.get(1).getChild(), root.branches.get(1), data);
             } else return false;
         }
     }
@@ -81,7 +91,7 @@ public class Tree<T extends Comparable, B extends Tree.TreeNode.Branch<? extends
         return branch;
     }
 
-    private <D extends Comparable> TreeNode findElementInBinarySortedTree(TreeNode root, D data) {
+    private <D extends Comparable> TreeNode findElementInBinarySortedTree(TreeNode<T, B> root, D data) {
         if (root.getDegree() != 2) {
             throw new RuntimeException("Should be degree 2");
         }
@@ -89,12 +99,11 @@ public class Tree<T extends Comparable, B extends Tree.TreeNode.Branch<? extends
             return root;
         if (root.getData().compareTo(data) >= 0) {
             if (root.branches.get(0) != null)
-                return findElementInBinarySortedTree(((TreeNode.Branch) root.branches.get(0)).getChild(), data);
+                return findElementInBinarySortedTree(root.branches.get(0).getChild(), data);
         } else {
             if (root.branches.get(1) != null)
-                return findElementInBinarySortedTree(((TreeNode.Branch) root.branches.get(1)).getChild(), data);
+                return findElementInBinarySortedTree(root.branches.get(1).getChild(), data);
         }
-
         return null;//
     }
 
@@ -247,8 +256,8 @@ public class Tree<T extends Comparable, B extends Tree.TreeNode.Branch<? extends
         }
 
         public static class Branch<B extends Comparable> {
-            private final B branchData;
             private final TreeNode parent;
+            private B branchData;
             private TreeNode child;
 
             public Branch(B branchData, TreeNode parent, TreeNode child) {
@@ -271,6 +280,10 @@ public class Tree<T extends Comparable, B extends Tree.TreeNode.Branch<? extends
 
             public B getBranchData() {
                 return branchData;
+            }
+
+            public void setBranchData(B branchData) {
+                this.branchData = branchData;
             }
         }
     }

@@ -12,14 +12,11 @@ import java.util.Random;
  */
 public class TreeTest {
 
-    private Tree.TreeNode<String, Tree.TreeNode.Branch<String>> root;
-
     private Tree<String, Tree.TreeNode.Branch<String>> tree;
 
     @Before
     public void setUp() {
-        root = new Tree.TreeNode<>("D");
-        tree = new Tree<>(root);
+        tree = new Tree<>("D");
         Tree.TreeNode<String, Tree.TreeNode.Branch<String>> level11 = new Tree.TreeNode<>("B");
         Tree.TreeNode<String, Tree.TreeNode.Branch<String>> level12 = new Tree.TreeNode<>("E");
         Tree.TreeNode<String, Tree.TreeNode.Branch<String>> level21 = new Tree.TreeNode<>("A");
@@ -42,7 +39,7 @@ public class TreeTest {
     @Test
     public void traversePreOrder_should_traverse_the_tree_preorder() {
         ArrayList<String> arrayList = new ArrayList<>();
-        tree.traversePreOrder(root, stringBranchTreeNode -> arrayList.add(stringBranchTreeNode.getData()));
+        tree.traversePreOrder(tree.getRoot(), stringBranchTreeNode -> arrayList.add(stringBranchTreeNode.getData()));
         Assert.assertEquals("D", arrayList.get(0));
         Assert.assertEquals("B", arrayList.get(1));
         Assert.assertEquals("A", arrayList.get(2));
@@ -53,7 +50,7 @@ public class TreeTest {
     @Test
     public void traverseInOrder_should_traverse_the_tree_inorder() {
         ArrayList<String> arrayList = new ArrayList<>();
-        tree.traverseInOrder(root, stringBranchTreeNode -> arrayList.add(stringBranchTreeNode.getData()));
+        tree.traverseInOrder(tree.getRoot(), stringBranchTreeNode -> arrayList.add(stringBranchTreeNode.getData()));
         Assert.assertEquals("A", arrayList.get(0));
         Assert.assertEquals("B", arrayList.get(1));
         Assert.assertEquals("C", arrayList.get(2));
@@ -64,7 +61,7 @@ public class TreeTest {
     @Test
     public void traversePostOrder_should_traverse_the_tree_postorder() {
         ArrayList<String> arrayList = new ArrayList<>();
-        tree.traversePostOrder(root, stringBranchTreeNode -> arrayList.add(stringBranchTreeNode.getData()));
+        tree.traversePostOrder(tree.getRoot(), stringBranchTreeNode -> arrayList.add(stringBranchTreeNode.getData()));
         Assert.assertEquals("A", arrayList.get(0));
         Assert.assertEquals("C", arrayList.get(1));
         Assert.assertEquals("B", arrayList.get(2));
@@ -77,7 +74,7 @@ public class TreeTest {
     @Test
     public void traverseDepthFirst_should_traverse_the_tree_depthFirst() {
         ArrayList<String> arrayList = new ArrayList<>();
-        tree.traverseDepthFirst(root, stringBranchTreeNode -> arrayList.add(stringBranchTreeNode.getData()));
+        tree.traverseDepthFirst(tree.getRoot(), stringBranchTreeNode -> arrayList.add(stringBranchTreeNode.getData()));
         Assert.assertEquals("D", arrayList.get(0));
         Assert.assertEquals("B", arrayList.get(1));
         Assert.assertEquals("E", arrayList.get(2));
@@ -92,8 +89,7 @@ public class TreeTest {
         int bound = 49;
         int randomInt = random.nextInt(bound);
         System.out.println(randomInt);
-        Tree.TreeNode<Integer, Tree.TreeNode.Branch<Integer>> root = new Tree.TreeNode<>(randomInt, 2);
-        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(root);
+        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(randomInt, 2);
 
         System.out.println("[");
         for (int i = 1; i < 10; i++) {
@@ -111,8 +107,7 @@ public class TreeTest {
         Random random = new Random();
         int bound = 49;
         System.out.println(0);
-        Tree.TreeNode<Integer, Tree.TreeNode.Branch<Integer>> root = new Tree.TreeNode<>(0, 2);
-        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(root);
+        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(0, 2);
 
         System.out.println("[");
         for (int i = 1; i < 10; i++) {
@@ -131,8 +126,7 @@ public class TreeTest {
         int bound = 1000;
         int randomInt = random.nextInt(bound);
         System.out.println(randomInt);
-        Tree.TreeNode<Integer, Tree.TreeNode.Branch<Integer>> root = new Tree.TreeNode<>(randomInt, 2);
-        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(root);
+        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(randomInt, 2);
 
         System.out.println("[");
         for (int i = 1; i < 1000; i++) {
@@ -153,8 +147,7 @@ public class TreeTest {
         int bound = 49;
         int randomInt = random.nextInt(bound);
         System.out.println(randomInt);
-        Tree.TreeNode<Integer, Tree.TreeNode.Branch<Integer>> root = new Tree.TreeNode<>(randomInt, 2);
-        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(root);
+        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(randomInt, 2);
         System.out.println("[");
         for (int i = 1; i < 10; i++) {
             randomInt = random.nextInt(bound);
@@ -173,8 +166,7 @@ public class TreeTest {
         int bound = 49;
         int[] arrays = {35, 76, 17, 42, 68, 11, 24, 63, 69, 23};
         System.out.println(60);
-        Tree.TreeNode<Integer, Tree.TreeNode.Branch<Integer>> root = new Tree.TreeNode<>(60, 2);
-        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(root);
+        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(60, 2);
         System.out.println("[");
         for (int i = 0; i < arrays.length; i++) {
             System.out.print("\t" + arrays[i]);
@@ -186,7 +178,7 @@ public class TreeTest {
         //System.out.println("After deleting");
         tree.printTreeWithBranchData("root");
         ArrayList<Integer> arrayList = new ArrayList<>();
-        tree.traverseDepthFirst(root, integerBranchTreeNode -> arrayList.add(integerBranchTreeNode.getData()));
+        tree.traverseDepthFirst(tree.getRoot(), integerBranchTreeNode -> arrayList.add(integerBranchTreeNode.getData()));
         Assert.assertEquals(Integer.valueOf(60), arrayList.get(0));
         Assert.assertEquals(Integer.valueOf(24), arrayList.get(1));
         Assert.assertEquals(Integer.valueOf(76), arrayList.get(2));
@@ -204,8 +196,7 @@ public class TreeTest {
         int bound = 49;
         int[] arrays = {35, 76, 17, 42, 68, 11, 24, 63, 69, 23};
         System.out.println(60);
-        Tree.TreeNode<Integer, Tree.TreeNode.Branch<Integer>> root = new Tree.TreeNode<>(60, 2);
-        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(root);
+        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(60, 2);
         System.out.println("[");
         for (int i = 0; i < arrays.length; i++) {
             System.out.print("\t" + arrays[i]);
@@ -217,7 +208,7 @@ public class TreeTest {
         //System.out.println("After deleting");
         //tree.printTreeWithBranchData("root");
         ArrayList<Integer> arrayList = new ArrayList<>();
-        tree.traverseDepthFirst(root, integerBranchTreeNode -> arrayList.add(integerBranchTreeNode.getData()));
+        tree.traverseDepthFirst(tree.getRoot(), integerBranchTreeNode -> arrayList.add(integerBranchTreeNode.getData()));
         Assert.assertEquals(Integer.valueOf(60), arrayList.get(0));
         Assert.assertEquals(Integer.valueOf(35), arrayList.get(1));
         Assert.assertEquals(Integer.valueOf(68), arrayList.get(2));
@@ -236,8 +227,7 @@ public class TreeTest {
         int bound = 49;
         int[] arrays = {35, 76, 17, 42, 68, 11, 24, 43, 63, 69, 23};
         System.out.println(60);
-        Tree.TreeNode<Integer, Tree.TreeNode.Branch<Integer>> root = new Tree.TreeNode<>(60, 2);
-        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(root);
+        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(60, 2);
         System.out.println("[");
         for (int i = 0; i < arrays.length; i++) {
             System.out.print("\t" + arrays[i]);
@@ -249,7 +239,7 @@ public class TreeTest {
         System.out.println("After deleting");
         tree.printTreeWithBranchData("root");
         ArrayList<Integer> arrayList = new ArrayList<>();
-        tree.traverseDepthFirst(root, integerBranchTreeNode -> arrayList.add(integerBranchTreeNode.getData()));
+        tree.traverseDepthFirst(tree.getRoot(), integerBranchTreeNode -> arrayList.add(integerBranchTreeNode.getData()));
         Assert.assertEquals(Integer.valueOf(60), arrayList.get(0));
         Assert.assertEquals(Integer.valueOf(35), arrayList.get(1));
         Assert.assertEquals(Integer.valueOf(76), arrayList.get(2));
@@ -268,8 +258,7 @@ public class TreeTest {
         int bound = 49;
         int[] arrays = {35, 76, 17, 42, 68, 11, 24, 63, 69, 23};
         System.out.println(60);
-        Tree.TreeNode<Integer, Tree.TreeNode.Branch<Integer>> root = new Tree.TreeNode<>(60, 2);
-        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(root);
+        Tree<Integer, Tree.TreeNode.Branch<Integer>> tree = new Tree<>(60, 2);
         System.out.println("[");
         for (int i = 0; i < arrays.length; i++) {
             System.out.print("\t" + arrays[i]);
