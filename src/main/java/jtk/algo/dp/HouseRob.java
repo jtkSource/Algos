@@ -40,7 +40,8 @@ public class HouseRob {
         if (cache.get(n-2) == null) {
             pickmax = maxLoot(hval, n - 2);
             cache.put(n-2,pickmax);
-        }else pickmax = cache.get(n-2);
+        }else
+            pickmax = cache.get(n-2);
 
         int pick = hval[n] + pickmax;
 
@@ -51,7 +52,8 @@ public class HouseRob {
         if (cache.get(n-1) == null) {
             notPick = maxLoot(hval, n - 1);
             cache.put(n-1,notPick);
-        }else notPick = cache.get(n-1);
+        }else
+            notPick = cache.get(n-1);
 
         // return max of picked and not picked
         return Math.max(pick, notPick);
