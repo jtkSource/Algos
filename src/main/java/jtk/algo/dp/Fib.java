@@ -20,14 +20,16 @@ public class Fib {
     }
 
     public static HashMap<Integer, Integer> cache = new HashMap<>();
+
     public static int fibMem(int n){
         if (n < 2) {
             return n;
         }
-        int n1 = cache.computeIfAbsent(n-1,integer -> fibMem(integer));
-        int n2 = cache.computeIfAbsent(n-2,integer -> fibMem(integer));
+        int n1 = cache.computeIfAbsent(n-1, Fib::fibMem);
+        int n2 = cache.computeIfAbsent(n-2, Fib::fibMem);
         return n1 + n2;
     }
+
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         IntStream.range(0,40)
