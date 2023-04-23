@@ -14,11 +14,11 @@ public class MaxSumSubArray {
     public static int findMaxSumSubArray(int[] arr, int k){
         int maxValue = Integer.MIN_VALUE;
         int currentRunningSum = 0;
-        for (int i = 0; i < arr.length; i++) {
-            currentRunningSum += arr[i];
-            if(i >= (k-1)){
+        for (int windowEnd = 0; windowEnd < arr.length; windowEnd++) {
+            currentRunningSum += arr[windowEnd];
+            if(windowEnd >= (k-1)){
               maxValue = Math.max(maxValue, currentRunningSum);
-              currentRunningSum -= arr[i-(k-1)] ;
+              currentRunningSum -= arr[windowEnd-(k-1)] ;
             }
         }
         return maxValue;
