@@ -24,6 +24,7 @@ public class MaxSumSubArray {
         return maxValue;
     }
     public static void main(String[] args) {
-        log.info("{}", findMaxSumSubArray(new int[]{4,2,1,7,8,1,2,8,1,0},3));
+        log.info("{}",
+                findMaxSumSubArray(new int[]{4,2,1,7,8,1,2,8,1,0},3));
     }
 }

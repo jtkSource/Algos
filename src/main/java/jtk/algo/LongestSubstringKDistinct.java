@@ -33,6 +33,7 @@ public class LongestSubstringKDistinct {
     }
     public static void main(String[] args) {
         String input = "AAAHHIBC";
-        log.info("Longest Substring with K Distinct characters: {}",findLength(input, 2));
+        log.info("Longest Substring with K Distinct characters: {}",
+                findLength(input, 2));
     }
 }
